@@ -5,14 +5,19 @@
 '''
 
 import os.path
+from collections import defaultdict
 from lxml import etree
+#print etree.LXML_VERSION #lxml版本訊息
 
-def print_BookContent(element):
-    print '< 文字:', element.text,
+infos = defaultdict(list)
 
-def print_ChapterID(element):
-    print ', 章節:', element.text, ">"
-
+def add_highlight_info(highlight):
+    book_content = highlight.find('BookContent').text
+    chapter_id = highlight.find('BeginPos').find('ChapterID').text
+    
+    contents = infos[chapter_id]
+    contents.append(book_content)
+    
 file_path = u'dkx'
 root = etree.parse(file_path)
 
@@ -20,8 +25,14 @@ root = etree.parse(file_path)
 file_item = root.find('FileItem')
 print os.path.basename(file_item.attrib['FilePath']), "\n"
 
-for element in root.iter():
-    if element.tag == 'BookContent':
-        print_BookContent(element)
-    elif element.tag == 'ChapterID' and element.getparent().tag == "BeginPos":
-        print_ChapterID(element)
+# 彙整每一個高亮的資訊
+highlights = root.findall('.//ReadingDataItem')
+for highlight in highlights:
+    add_highlight_info(highlight)
+
+# 將章節與其內文輸出
+for key, value in sorted(infos.items()):
+    print key, ':'
+    for content in value:
+        print '  <', content , '>',
+    print ''
