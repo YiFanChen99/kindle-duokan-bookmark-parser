@@ -36,3 +36,6 @@ for key, value in sorted(infos.items()):
     for content in value:
         print '  <', content , '>',
     print ''
+
+print u'完成，請按Enter終止。'
+raw_input('')
