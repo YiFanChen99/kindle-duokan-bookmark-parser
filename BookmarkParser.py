@@ -8,7 +8,7 @@ import os.path
 import sys
 from collections import defaultdict
 from lxml import etree
-OUTPUT_FILE = 'D:\Dropbox\SyncWithPig\kindle-duokan-bookmark-parser\contents.txt'
+OUTPUT_FILE = os.path.dirname(sys.argv[0]) + '/contents.txt'
 #print etree.LXML_VERSION #lxml版本訊息
 
 
@@ -37,13 +37,13 @@ def parse_file(file_path):
 
 # 將章節與其內文輸出
 def save_contents(book_name, infos):
-    with open(OUTPUT_FILE, 'a') as file:
+    with open(OUTPUT_FILE, 'a') as the_file:
         results = u''
         for chapter, contents in sorted(infos.items()):
             results += u'\t' + chapter + u':\n'
             results += u'\t\t  「 ' + u' 」\t「 '.join(contents) + u' 」\n'
-        file.write(book_name.encode('utf-8') + ' 已經完成。\n')
-        file.write(results.encode('utf-8') + '\n\n')
+        the_file.write(book_name.encode('utf-8') + ' 已經完成。\n')
+        the_file.write(results.encode('utf-8') + '\n\n')
 
 
 def main():
