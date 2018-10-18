@@ -2,11 +2,12 @@
 將多看系統標記的批注彙整並輸出到檔案，以供用電腦編輯原始檔案
 """
 
-import os.path
+import os
 import sys
 from collections import defaultdict
 from lxml import etree
 OUTPUT_FILE = str.format('{0}{1}{2}', os.path.dirname(sys.argv[0]), os.path.sep, 'contents.txt')
+TARGET_DIR = 'E:\Projects\PowerShellFileMover'
 #print etree.LXML_VERSION #lxml版本訊息
 
 
@@ -44,13 +45,34 @@ def save_contents(book_name, infos):
         print(str.format('{0}\n\n', results), file=the_file)
 
 
+def get_files():
+    if len(sys.argv) > 1:
+        return sys.argv[1:]
+
+    yield from get_level_1_files(TARGET_DIR)
+    for name in os.listdir(TARGET_DIR):
+        full_path = os.path.join(TARGET_DIR, name)
+        if os.path.isdir(full_path):
+            yield from get_level_1_files(full_path)
+
+
+def get_level_1_files(dir_path, target_name='dkx'):
+    for name in os.listdir(dir_path):
+        full_path = os.path.join(dir_path, name)
+        if os.path.isfile(full_path) and name == target_name:
+            yield full_path
+
+
 def main():
-    for file_id in range(1, len(sys.argv)):
-        parse_file(sys.argv[file_id])
+    count = 0
+    for file in get_files():
+        count += 1
+        parse_file(file)
+    return count
 
 
 if __name__ == "__main__":
-    main()
-    print('完成，請按 Enter 檢視檔案。')
+    count = main()
+    print('完成 %d 個檔案，請按 Enter 檢視檔案。' % count)
     input('')
     os.startfile(OUTPUT_FILE)
